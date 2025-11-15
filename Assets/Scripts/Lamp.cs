@@ -2,22 +2,18 @@ using UnityEngine;
 
 public class Lamp : MonoBehaviour
 {
-    private GameObject lightObj;
-    private Light lampLight;
+    public bool isAction = false;
+    public Button button;
 
-    void Start()
-    {
-        lightObj = GameObject.Find("LightButton");
-        lampLight = GetComponent<Light>();
+    private void Start() {
+        button?.onButton.AddListener(SetAction);
     }
 
-    void Update()
-    {
-        Button light = lightObj.GetComponent<Button>();
-        if (light.isAction) {
-            lampLight.color = Color.yellow;
-        } else {
-            lampLight.color = Color.black;
-        }
+    private void Update() {
+        // SetAction();
+    }
+
+    private void SetAction(bool state) {
+        this.isAction = state;
     }
 }

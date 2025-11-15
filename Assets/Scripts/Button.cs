@@ -1,27 +1,19 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Button : MonoBehaviour
 {
     public bool isAction = true;
+    // public Lamp link;
+    // [System.Serializable]
+    public UnityEvent<bool> onButton;
 
-    private void Start()
+    private void Update()
     {
-
+        GetComponent<Renderer>().material.color = isAction ? Color.green : Color.red;
+        onButton?.Invoke(this.isAction);
     }
-    private
-    void Update()
-    {
-        if (isAction)
-        {
-            GetComponent<Renderer>().material.color = Color.green;
-        }
-        else
-        {
-            GetComponent<Renderer>().material.color = Color.red;
-        }
-    }
-    public void switchActions()
-    {
-        this.isAction = !this.isAction;
-    }
+    // public bool GetAction() {
+    //     return this.isAction;
+    // }
 }
