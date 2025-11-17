@@ -5,21 +5,16 @@ public class Water : MonoBehaviour
     public int water = 0;
     public int MAX_WATER = 16;
     public Water link;
-    // private GameObject waterObj;
+    private Transform view;
     protected float time = 0f;
     protected float interval = 1f;
     private float MAX_HEIGHT;
-    private float height;
 
     void Start()
     {
-        // this.waterObj = transform.Find("Water")?.gameObject;
-        // if (waterObj == null) {
-        //     enabled = false;
-        //     return;
-        // }
-        this.MAX_HEIGHT = 0.000104f;
-        // View();
+        view = transform.Find("Water");
+        MAX_HEIGHT = view.localScale.y;
+        View();
     }
 
     void Update()
@@ -27,25 +22,17 @@ public class Water : MonoBehaviour
         time += Time.deltaTime;
         if (time >= interval) {
             SetWater();
-            // this.waterObj.SetActive(water > 0);
+            View();
             time = 0;
-
         }
     }
     public void SetWater() {
-        if (this.link != null 
-        && this.MAX_WATER > this.water 
-        && this.link.GetWater()) {
+        if (link != null 
+        && MAX_WATER > water 
+        && link.GetWater()) {
             water++;
-            // View();
         }
     }
-    // private void View() {
-    //     height = MAX_HEIGHT / (float)water;
-    //     Vector3 newScale = waterObj.transform.localScale;
-    //     newScale.y = height;
-    //     waterObj.transform.localScale = newScale;
-    // }
     public virtual bool GetWater() {
         if (this.water > 0) {
             water--;
@@ -53,5 +40,13 @@ public class Water : MonoBehaviour
         } else {
             return false;
         }
+    }
+    private void View() {
+        float ratio = (float)water / MAX_WATER;
+        float height = MAX_HEIGHT * ratio;
+        Vector3 scale = view.localScale;
+        scale.y = height;
+        view.localScale = scale;
+        view.gameObject.SetActive(water > 0);
     }
 }

@@ -2,18 +2,22 @@ using UnityEngine;
 
 public class Plant : MonoBehaviour
 {
-    public float height = 1;
+    [Header("Настройкт")]
     public bool isRefresh = true;
-    private float scaleHeight;
-    private int MAX_HEIGHT = 30;
-    private int stage = 0;
     [Header("Стадии")]
     public int STAGE_1 = 3;
     public int STAGE_2 = 6;
     public int STAGE_3 = 8;
+    [Header("Среда")]
+    public int MIN_TEMP = 10;
+    public int MAX_TEMP = 30;
+    private float height = 1;
+    private float scaleHeight;
+    private int MAX_HEIGHT = 30;
+    private int stage = 0;
     private int TIME_RIPE = 2;
     private int ripeTime = 0;
-    public int rot = 0;
+    private int rot = 0;
     private float time = 0f;
     private float interval = 2f;
     private Water water;
@@ -24,20 +28,14 @@ public class Plant : MonoBehaviour
     private Transform trunk;
     private Transform leaf;
     private Transform ripe;
-    public int MIN_TEMP = 10;
-    public int MAX_TEMP = 30;
-    private Renderer plantRenderer; // Color
 
     void Start()
     {
-        water = transform.parent?.GetComponent<Water>();
-        glow = transform.parent?.GetComponent<Glow>();
-        temp = transform.parent?.GetComponent<Temp>();
+        GetParentComponent();
         ground = transform.Find("Ground");
         sids = transform.Find("Sids");
         trunk = transform.Find("Trunk");
         scaleHeight = trunk.localScale.y;
-        plantRenderer = trunk?.GetComponent<Renderer>();
         leaf = transform.Find("Leaf");
         ripe = transform.Find("Ripe");
     }
@@ -67,7 +65,7 @@ public class Plant : MonoBehaviour
 
                 sids?.gameObject.SetActive(false);
                 trunk?.gameObject.SetActive(true);
-                SetHeight();
+                ViewHeight();
                 
             } else if (STAGE_3 > stage) {
 
@@ -79,7 +77,6 @@ public class Plant : MonoBehaviour
 
             } else {
                 if (isRefresh) {
-                    plantRenderer.material.color = Color.green;
                     stage = STAGE_1;
                 } else {
                     Destroy(gameObject);
@@ -91,63 +88,62 @@ public class Plant : MonoBehaviour
         } else {
             rot++;
         }
-        Debug.Log($"Plant stage: {stage}, Height: {height}, Ripe: {ripeTime}");
+        Debug.Log($"Plant stage: {stage}, Ripe: {ripeTime}");
     }
 
-    private void SetHeight() {
-        if (MAX_HEIGHT > height) {
-            height += (float)MAX_HEIGHT / (STAGE_2 - STAGE_1);
-            ViewHeight();
-        }
-    }
     private void ViewHeight() {
-        float scale = Mathf.Lerp(scaleHeight / MAX_HEIGHT, scaleHeight, (float)height / MAX_HEIGHT);
-        trunk.localScale = new Vector3(scale, scale, scale);
+        if (MAX_HEIGHT > height) { 
+            height += (float)MAX_HEIGHT / (STAGE_2 - STAGE_1);
+            float scale = Mathf.Lerp(scaleHeight / MAX_HEIGHT, scaleHeight, (float)height / MAX_HEIGHT);
+            trunk.localScale = new Vector3(scale, scale, scale);
+        }
     }
     private bool IsValidate() {
         return ViewGlow() 
             && ViewWater()
-            && temp?.GetTemp() is int tempVal && tempVal > MIN_TEMP && tempVal < MAX_TEMP;
+            && temp?.GetTemp() is float tempVal && tempVal > MIN_TEMP && tempVal < MAX_TEMP;
     }
+    void SetColor(Renderer renderer, Color color) => renderer.material.color = color;
     private bool ViewWater() {
         Renderer groundRenderer = ground?.GetComponent<Renderer>();
         if (water.water > 3) {
-            groundRenderer.material.color = Color.black;
+            SetColor(groundRenderer, Color.black);
             return false;
         } else if (!water.GetWater()) {
-            groundRenderer.material.color = Color.yellow;
+            SetColor(groundRenderer, Color.yellow);
             return false;
         }
-        groundRenderer.material.color = Color.green;
+        SetColor(groundRenderer, Color.green);
         return true;
     }
     private bool ViewGlow() {
         Renderer leafRenderer = leaf?.GetComponent<Renderer>();
         if (!glow.GetGlow()) {
-            leafRenderer.material.color = Color.yellow;
+            SetColor(leafRenderer, Color.yellow);
             return false;
         }
-        leafRenderer.material.color = Color.green;
+        SetColor(leafRenderer, Color.green);
         return true;
     }
     private bool ViewTemp() {
         Renderer trunkRenderer = trunk?.GetComponent<Renderer>();
         if (MIN_TEMP > temp.GetTemp()) {
-            trunkRenderer.material.color = Color.yellow;
+            SetColor(trunkRenderer, Color.yellow);
             return false;
         } else if (temp.GetTemp() > MAX_TEMP) {
-            trunkRenderer.material.color = Color.yellow;
+            SetColor(trunkRenderer, Color.yellow);
             return false;
         }
+        SetColor(trunkRenderer, Color.green);
         return true;
     }
     private void ViewRipe(bool isRipe) {
         ripe?.gameObject.SetActive(true);
         Renderer ripeRenderer = ripe?.GetComponent<Renderer>();
         if (isRipe) {
-            ripeRenderer.material.color = Color.red;
+            SetColor(ripeRenderer, Color.red);
         } else {
-            ripeRenderer.material.color = Color.green;
+            SetColor(ripeRenderer, Color.green);
         }
     }
     public bool GetRipe() {
@@ -160,6 +156,9 @@ public class Plant : MonoBehaviour
         }
     }
     private void OnTransformParentChanged() {
+        GetParentComponent();
+    }
+    private void GetParentComponent() {
         water = transform.parent?.GetComponent<Water>();
         glow = transform.parent?.GetComponent<Glow>();
         temp = transform.parent?.GetComponent<Temp>();

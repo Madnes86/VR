@@ -7,6 +7,7 @@ public class Button : MonoBehaviour
     // public Lamp link;
     // [System.Serializable]
     public UnityEvent<bool> onButton;
+    public UnityEvent onPress; // what ?
 
     private void Update()
     {

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Temp : MonoBehaviour
 {
-    public int temp;
+    public float temp;
     public Temp link;
 
     void Start()
@@ -12,15 +12,17 @@ public class Temp : MonoBehaviour
 
     void Update()
     {
-        SetTemp();
+        // SetTemp();
     }
 
-    public void SetTemp() {
-        if (link != null) {
-            this.temp = link.GetTemp();
-        }
+    public void SetTemp(float value) {
+        temp = value;
+        Debug.Log($"test {value}");
+        // if (link != null) {
+        //     this.temp = link.GetTemp();
+        // }
     }
-    public int GetTemp() {
-        return this.temp;
+    public float GetTemp() {
+        return temp;
     }
 }

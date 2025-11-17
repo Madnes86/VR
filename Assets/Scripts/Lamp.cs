@@ -1,19 +1,26 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Lamp : MonoBehaviour
 {
     public bool isAction = false;
-    public Button button;
+    public Toggle toggle;
+    private Light light;
 
     private void Start() {
-        button?.onButton.AddListener(SetAction);
+        toggle?.onValueChanged.AddListener(SetAction);
+        light = GetComponent<Light>();
     }
 
     private void Update() {
-        // SetAction();
+        light.enabled = isAction;
     }
 
-    private void SetAction(bool state) {
+    public void SetAction(bool state) {
         this.isAction = state;
+    }
+    public void Toggle() {
+        isAction = !isAction;
+        Debug.Log(isAction);
     }
 }
